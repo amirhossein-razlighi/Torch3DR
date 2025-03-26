@@ -1,10 +1,10 @@
 import torch
 from pytorch3d.structures import Pointclouds
-
+from typing import Union
 
 def chamfer_distance(
-    src_pc: Pointclouds,
-    dst_pc: Pointclouds,
+    src_pc: Union[Pointclouds, torch.Tensor],
+    dst_pc: Union[Pointclouds, torch.Tensor],
     batch_reduction: str = "mean",
 ) -> torch.Tensor:
     """
@@ -18,8 +18,8 @@ def chamfer_distance(
     Returns:
         Chamfer distance between the two point clouds.
     """
-    src_points = src_pc.points_list()
-    dst_points = dst_pc.points_list()
+    src_points = src_pc.points_list() if isinstance(src_pc, Pointclouds) else src_pc
+    dst_points = dst_pc.points_list() if isinstance(dst_pc, Pointclouds) else dst_pc
 
     chamfer_distances = []
 
