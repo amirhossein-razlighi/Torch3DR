@@ -1,8 +1,13 @@
 import pytest
 import torch
-from pytorch3d.structures import Pointclouds
+from pytorch3d.structures import Pointclouds, Meshes
 from pytorch3d.loss import chamfer_distance as pytorch3d_chamfer_distance
-from torch3dr.losses import binary_cross_entropy_loss, chamfer_distance
+from pytorch3d.loss import mesh_laplacian_smoothing as pytorch3d_laplacian_smooth_loss
+from torch3dr.losses import (
+    binary_cross_entropy_loss,
+    chamfer_distance,
+    laplacian_smooth_loss,
+)
 
 
 @pytest.mark.parametrize(
@@ -45,3 +50,22 @@ def test_chamfer_distance(src_pc, dst_pc, batch_reduction):
     )[0]
     custom_loss = chamfer_distance(src_pc, dst_pc, batch_reduction=batch_reduction)
     torch.testing.assert_close(custom_loss, torch_loss, rtol=1e-5, atol=1)
+
+
+@pytest.mark.parametrize(
+    "mesh_src",
+    [
+        Meshes(
+            verts=[torch.rand((10, 3))],
+            faces=[torch.randint(0, 10, (10, 3))],
+        ),
+        Meshes(
+            verts=[torch.rand((10, 3))],
+            faces=[torch.randint(0, 10, (10, 3))],
+        ),
+    ],
+)
+def test_laplacian_smooth_loss(mesh_src):
+    torch_loss = pytorch3d_laplacian_smooth_loss(mesh_src)
+    custom_loss = laplacian_smooth_loss(mesh_src)
+    torch.testing.assert_close(custom_loss, torch_loss, rtol=1e-5, atol=0.5)
