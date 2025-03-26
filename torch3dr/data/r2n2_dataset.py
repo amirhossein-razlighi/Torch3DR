@@ -27,7 +27,7 @@ from pytorch3d.datasets.r2n2.utils import (
     read_binvox_coords,
     voxelize,
 )
-import utils_vox
+from .utils_vox import voxelize_xyz
 
 
 SYNSET_DICT_DIR = Path(utils.__file__).resolve().parent
@@ -346,7 +346,7 @@ class R2N2(ShapeNetBase):  # pragma: no cover
             # Align voxels to the same coordinate system as mesh verts.
             voxel_coords = align_bbox(voxel_coords, model["verts"])
             model["voxel_coords"] = voxel_coords
-            voxels = utils_vox.voxelize_xyz(voxel_coords.unsqueeze(0),32,32,32).squeeze(0)
+            voxels = voxelize_xyz(voxel_coords.unsqueeze(0),32,32,32).squeeze(0)
             # for RT in voxel_RTs:
             #     # Compute projection matrix.
             #     P = BLENDER_INTRINSIC.mm(RT)
