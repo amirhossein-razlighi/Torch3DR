@@ -2,15 +2,22 @@ import time
 import torch
 from torch3dr.losses import chamfer_distance
 from torch3dr.data import R2N2
+from torch3dr.visualize import visualize_multiple_pcs_in_one_plot
 from pytorch3d.ops import sample_points_from_meshes
-from pytorch3d.structures import Meshes
+from pytorch3d.structures import Meshes, Pointclouds
 
 
 def fit_pointcloud(pointclouds_src, pointclouds_tgt):
     start_iter = 0
     start_time = time.time()
-    optimizer = torch.optim.Adam([pointclouds_src], lr=1e-3)
-    MAX_ITER = 100
+    MAX_ITER = 500
+    VISUALIZE_EACH = 25
+    LR = 1e-2
+
+    optimizer = torch.optim.Adam([pointclouds_src], lr=LR, betas=(0.9, 0.999))
+    print("Fitting pointclouds...")
+    print("Initial loss: ", chamfer_distance(pointclouds_src, pointclouds_tgt).item())
+
     for step in range(start_iter, MAX_ITER):
         iter_start_time = time.time()
 
@@ -30,7 +37,17 @@ def fit_pointcloud(pointclouds_src, pointclouds_tgt):
             % (step, MAX_ITER, total_time, iter_time, loss_vis)
         )
 
-    print("Fitting done")
+        if step % VISUALIZE_EACH == 0:
+            viz_source = Pointclouds(points=pointclouds_src.detach(), features=None)
+            viz_target = Pointclouds(points=pointclouds_tgt.detach(), features=None)
+            fig_ = visualize_multiple_pcs_in_one_plot(
+                pointclouds=[viz_source, viz_target],
+                titles=["Source Pointcloud", "Target Pointcloud"],
+                colors=[(1.0, 0.0, 0.0), (0.0, 1.0, 0.0)],
+            )
+            fig_.show()
+
+    print("Fitting done!")
 
 
 def main():
@@ -45,7 +62,9 @@ def main():
     verts = feed["verts"]
     faces = feed["faces"]
 
-    pc_source = torch.randn((1, 10_000, 3), requires_grad=True)
+    NUM_INITIAL_POINTS = 5_000
+
+    pc_source = torch.randn((1, NUM_INITIAL_POINTS, 3), requires_grad=True)
     pc_target = sample_points_from_meshes(Meshes(verts=[verts], faces=[faces]), 10_000)
 
     fit_pointcloud(pc_source, pc_target)
