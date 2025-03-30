@@ -85,25 +85,26 @@ def main():
             loss = criterion(pred, voxels)
             loss.backward()
             optimizer.step()
+
             if i % 100 == 0:
                 print(
                     f"Epoch [{epoch + 1}/{EPOCHS}], Step [{i}], Loss: {loss.item():.4f}"
                 )
-                if epoch % 10 == 0 and i == which_step_to_visualize:
-                    print("Visualizing voxel grids...")
-                    print("-" * 20)
-                    visualize_voxels(
-                        pred[0].detach().cpu(),
-                        threshold=0.5,
-                        show_or_save="show",
-                        title="Predicted Voxel Grid",
-                    )
-                    visualize_voxels(
-                        voxels[0].detach().cpu(),
-                        threshold=0.5,
-                        show_or_save="show",
-                        title="Ground Truth Voxel Grid",
-                    )
+            if epoch % 10 == 0 and i == which_step_to_visualize:
+                print("Visualizing voxel grids...")
+                print("-" * 20)
+                visualize_voxels(
+                    pred[0].detach().cpu(),
+                    threshold=0.5,
+                    show_or_save="show",
+                    title="Predicted Voxel Grid",
+                )
+                visualize_voxels(
+                    voxels[0].detach().cpu(),
+                    threshold=0.5,
+                    show_or_save="show",
+                    title="Ground Truth Voxel Grid",
+                )
 
 
 if __name__ == "__main__":
