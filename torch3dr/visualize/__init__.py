@@ -1,1 +1,2 @@
 from .pointcloud_viz import visualize_multiple_pcs_in_one_plot
+from .voxel_viz import visualize_voxels
