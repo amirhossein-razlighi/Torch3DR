@@ -9,7 +9,7 @@ def visualize_voxels(
     title: str = "Voxel Visualization",
 ) -> plt.figure:
     """
-    Visualize a voxel grid using Plotly.
+    Visualize a voxel grid.
 
     Args:
         voxels (torch.Tensor): Voxel grid of shape (D, D, D)
