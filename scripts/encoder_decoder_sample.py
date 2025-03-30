@@ -66,6 +66,8 @@ def main():
         shuffle=True,
         num_workers=4,
         collate_fn=collate_batched_R2N2,
+        pin_memory=True,
+        drop_last=True,
     )
 
     for epoch in range(EPOCHS):
